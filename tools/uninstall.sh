@@ -16,6 +16,14 @@ show_err() {
     printf "\033[0;31mAn error occurred:\033[0m %s\n" "$1" >&2
 }
 
+# Prompt the user to confirm the uninstallation
+read -p "Are you sure you want to uninstall ServUP? (y/N): " answer
+
+if [ "$answer" != "y" ] && [ "$answer" != "Y" ]; then
+    echo "Uninstallation cancelled."
+    exit 0
+fi
+
 # Check if sudo is available
 if ! command_exists sudo; then
     show_err "sudo is not installed. Please install sudo to run this script."
@@ -53,8 +61,7 @@ SSH_CONF="/etc/ssh/sshd_config"
 
 # Remove the port from the SSH configuration
 if ! sudo sed -i "/$PORT_LINE/d" "$SSH_CONF"; then
-    show_err "failed to remove the port $port from the SSH configuration."
-    exit 1
+    show_err "failed to remove the port $port from the SSH configuration. Please remove it manually from $SSH_CONF."
 fi
 
 echo "Applying changes to SSH configuration..."
@@ -69,6 +76,37 @@ else
 fi
 
 [ "$failed" = 1 ] && show_err "could not restart SSH service. Please restart it manually."
+
+$UNINSTALL_ALIAS="alias servup-uninstall='sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/uninstall.sh)\"'"
+$FIREWALL_ALIAS="alias servup-firewall='sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)\"'"
+
+# Removing ServUP aliases
+if [ -f "/etc/zsh/zprofile" ]; then
+
+    if ! sudo sed -i "/$UNINSTALL_ALIAS/d" "/etc/zsh/zprofile"; then
+        show_err "could not remove the uninstaller alias from /etc/zsh/zprofile."
+    fi
+
+    if ! sudo sed -i "/$FIREWALL_ALIAS/d" "/etc/zsh/zprofile"; then
+        show_err "could not remove the firewall tool alias from /etc/zsh/zprofile."
+    fi
+
+    if ! sudo source /etc/zsh/zprofile; then
+       show_err "could not apply aliases removal in /etc/zsh/zprofile."
+    fi
+elif [ -f "/etc/bash.bashrc" ]; then
+    if ! sudo sed -i "/$UNINSTALL_ALIAS/d" "/etc/bash.bashrc"; then
+        show_err "could not remove the uninstaller alias from /etc/bash.bashrc."
+    fi
+
+    if ! sudo sed -i "/$FIREWALL_ALIAS/d" "/etc/bash.bashrc"; then
+        show_err "could not remove the firewall tool alias from /etc/bash.bashrc."
+    fi
+
+    if ! sudo source /etc/bash.bashrc; then
+       show_err "could not apply aliases removal in /etc/bash.bashrc."
+    fi
+fi
 
 # Finish uninstallation
 echo "\n\033[1;32mUninstallation completed successfully!\033[0m"
