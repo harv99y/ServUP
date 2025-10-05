@@ -1,0 +1,80 @@
+#####################################################################
+# ServUP  Copyright (C) 2025  S2009                                 #
+# LICENSE: GPL-3.0                                                  #
+# More informations at: https://github.com/S2009-dev/ServUP/LICENSE #
+#####################################################################
+
+name: ServUP Deployment
+
+on:
+  workflow_dispatch:
+      inputs:
+        artifact:
+          description: 'Name of the artifact to upload (ex: my-artifact)'
+          required: true
+          type: string
+        run-id:
+          description: 'Run ID of the workflow that generated the artifact'
+          required: true
+          type: string
+        directory:
+          description: 'Path to the directory where the artifact will be uploaded (ex: /var/www/html)'
+          required: true
+          type: string
+  workflow_call:
+    inputs:
+      artifact:
+        required: true
+        type: string
+      run-id:
+          required: true
+          type: string
+      directory:
+        required: true
+        type: string
+
+jobs:
+  servup_deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: ${{ inputs.artifact }}
+          github-token: ${{ secrets.GH_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.run-id }}
+
+
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Create remote directory
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+              -p ${{ secrets.SSH_PORT }} \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+              "mkdir -p ${{ inputs.directory }}"
+
+      - name: Upload artifact
+        run: |
+          scp -o StrictHostKeyChecking=no \
+              -P ${{ secrets.SSH_PORT }} \
+              ${{ inputs.artifact }}.zip \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ inputs.directory }}
+
+      - name: Extract artifact
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+              -p ${{ secrets.SSH_PORT }} \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+              "cd \"${{ inputs.directory }}\" && unzip -o \"${{ inputs.artifact }}\""
+
+      - name: Cleanup
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+              -p ${{ secrets.SSH_PORT }} \
+              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+              "cd \"${{ inputs.directory }}\" && rm \"${{ inputs.artifact }}.zip\""
