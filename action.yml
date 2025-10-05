@@ -55,7 +55,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no \
               -p ${{ secrets.SSH_PORT }} \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+              servup@${{ secrets.SSH_HOST }} \
               "mkdir -p ${{ inputs.remote }}"
 
       - name: Upload artifact
@@ -63,18 +63,18 @@ jobs:
           scp -o StrictHostKeyChecking=no \
               -P ${{ secrets.SSH_PORT }} \
               ${{ inputs.artifact }}.zip \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ inputs.remote }}
+              servup@${{ secrets.SSH_HOST }}:${{ inputs.remote }}
 
       - name: Extract artifact
         run: |
           ssh -o StrictHostKeyChecking=no \
               -p ${{ secrets.SSH_PORT }} \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+              servup@${{ secrets.SSH_HOST }} \
               "cd \"${{ inputs.directory }}\" && unzip -o \"${{ inputs.artifact }}\""
 
       - name: Cleanup
         run: |
           ssh -o StrictHostKeyChecking=no \
               -p ${{ secrets.SSH_PORT }} \
-              ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+              servup@${{ secrets.SSH_HOST }} \
               "cd \"${{ inputs.directory }}\" && rm \"${{ inputs.artifact }}.zip\""
