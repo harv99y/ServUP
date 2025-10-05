@@ -1,0 +1,47 @@
+name: 🐛 Bug Report
+description: Reporting bugs helps us improve the tool!
+title: "[BUG]: "
+
+body:
+  - type: textarea
+    attributes:
+      label: Description
+      description: The more details, the faster we can find the bug!
+      placeholder: I have a problem with...
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: How can we reproduce the bug?
+      placeholder: |
+        1. Install the tool
+        2. Configure the repository
+        4. Create this workflow:
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Version of Linux distribution
+      description: cat /etc/os-release
+      placeholder: latest
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Version of ServUP
+      description: Find it in the Releases section of this repo.
+      placeholder: latest
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Workflow
+      description: You can provide us your entire workflow script if you want.
+      placeholder: Paste the script here
+    validations:
+      required: false
