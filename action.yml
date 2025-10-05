@@ -6,8 +6,11 @@
 
 name: ServUP Deployment
 description: Upload an artifact from Github Actions to a server using SSH
-icon: upload-cloud
-color: blue
+author: S2009
+
+branding:
+  icon: upload-cloud
+  color: blue
 
 on:
   workflow_dispatch:
