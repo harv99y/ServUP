@@ -130,17 +130,12 @@ if command_exists apache2; then
     echo "Adding apache deployment support..."
 
     # Add apache deployment support
-    if ! sudo echo 'servup ALL=(www-data) NOPASSWD: /usr/bin/cp -drf /var/lib/servup/remote /var/www/remote' > /etc/sudoers.d/servup; then
+    if ! sudo echo 'servup ALL=(www-data) NOPASSWD: /usr/bin/cp -drf /var/lib/servup/* /var/www/*' > /etc/sudoers.d/servup; then
         show_err "could not add apache deployment support."
     fi
 fi
 
 echo "Finishing installation..."
-
-# Create the directory for the remote files
-if ! sudo -u servup mkdir -p /var/lib/servup/remote; then
-    show_err "could not create the ServUP directory for the remote files."
-fi
 
 # Check if iptables is installed
 if command_exists iptables; then
@@ -161,10 +156,10 @@ if [ -f "/etc/zsh/zprofile" ]; then
     fi
 
     if ! sudo echo "alias servup-firewall='sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)\"'" >> /etc/zsh/zprofile; then
-              show_err "could not add the firewall tool alias to /etc/zsh/zprofile."
+        show_err "could not add the firewall tool alias to /etc/zsh/zprofile."
     fi
 
-    if ! sudo source /etc/zsh/zprofile; then
+    if ! source /etc/zsh/zprofile; then
        show_err "could not apply aliases in /etc/zsh/zprofile."
     fi
 elif [ -f "/etc/bash.bashrc" ]; then
@@ -176,7 +171,7 @@ elif [ -f "/etc/bash.bashrc" ]; then
         show_err "could not add the firewall tool alias to /etc/bash.bashrc."
     fi
 
-    if ! sudo source /etc/bash.bashrc; then
+    if ! source /etc/bash.bashrc; then
        show_err "could not apply aliases in /etc/bash.bashrc."
     fi
 fi
